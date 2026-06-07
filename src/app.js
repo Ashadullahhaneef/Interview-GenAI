@@ -12,11 +12,13 @@
 
 
 const express = require("express");
+const cookieParser = require("cookie-parser")
 const app = express();
 
 //middleware => jo help karti hai request ki body se data ko read karne ke liye allow karta hai
 
-app.use(express.json())   
+app.use(express.json())  
+app.use(cookieParser());
  
 
 
