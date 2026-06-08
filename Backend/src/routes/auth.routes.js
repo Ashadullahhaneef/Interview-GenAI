@@ -10,6 +10,7 @@ const authMiddleware = require("../middlewares/auth.middleware")
  * @description signup user with email,username,password
  * @access public
  */
+
 authRouter.post("/register", authController.registerUserController);
  
 /**
