@@ -1,0 +1,14 @@
+// UI
+// =>Components
+// =>Pages
+
+// Hooks = for managing state and api layers
+// =>Hooks
+
+// State = frontend me jo data store hoga wo state me manage karte hai ki baad me UI par dikha sake.
+// => auth.context-file
+// => ai.context-file
+
+// Api =  for communication with backend
+// =>services
+//   =>auth.api-file

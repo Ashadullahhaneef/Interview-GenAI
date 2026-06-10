@@ -1,14 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import "../auth.form.scss";
 import { Link } from "react-router-dom";
-
-const handleSubmit = (e) => {
-  e.preventDefault();
-};
-
-
+import { useAuth } from "../hooks/useAuth";
+import {useNavigate} from "react-router-dom"
 
 const Login = () => {
+
+  const [email, setEmail ] = useState("");
+  const [ password, setPassword ] = useState(""); 
+  const { loading, handleLogin } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await handleLogin({ email, password });
+    navigate("/");
+  };
+  if (loading) {
+    return (
+      <main>
+        <h1>Loading...</h1>
+      </main>
+    );
+  }
+
   return (
     <main>
       <div className="form-container">
@@ -17,6 +32,9 @@ const Login = () => {
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
               type="email"
               id="email"
               name="email"
@@ -26,6 +44,9 @@ const Login = () => {
           <div className="input-group">
             <label htmlFor="passoword">Password</label>
             <input
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
               type="password"
               id="password"
               name="password"
@@ -34,7 +55,9 @@ const Login = () => {
             <button className="button primary-button">Sign In</button>
           </div>
         </form>
-         <p>Don't have an account? <Link to={"/register"}>Register</Link></p>
+        <p>
+          Don't have an account? <Link to={"/register"}>Register</Link>
+        </p>
       </div>
     </main>
   );
