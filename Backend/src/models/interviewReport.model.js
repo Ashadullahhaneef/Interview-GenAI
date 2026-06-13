@@ -33,7 +33,7 @@ const moongoose = require("mongoose");
 const technicalQuestionSchema = new mongoose.Schema(
   {
     question: {
-      type: Sting,
+      type: String,
       required: [true, "Technical Question Is Required"],
     },
     intention: {
@@ -102,7 +102,6 @@ const interviewReportSchema = new mongoose.Schema(
     },
     resume: {
       type: String,
-      
     },
     selfDescription: {
       type: String,
@@ -116,6 +115,10 @@ const interviewReportSchema = new mongoose.Schema(
     behaviourQuestions: [behaviourQuestionSchema],
     skillGaps: [skillGapSchema],
     preparationPlan: [preparationPlanSchema],
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
   },
   {
     timestamps: true,

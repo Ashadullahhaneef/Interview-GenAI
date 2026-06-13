@@ -1,30 +1,28 @@
-//google doc => se ek package install karna hai jo gemeini ka instance dega [npm install @google/genai] fir uske Quickstart me jaana wahan googlegemini ka instance kaise lena hai wo batayega => import { GoogleGenAI } from "@google/genai";
+//google doc => se ek package install karna hai jo gemini ka instance dega [npm install @google/genai] fir uske Quickstart me jaana wahan googlegemini ka instance kaise lena hai wo batayega => import { GoogleGenAI } from "@google/genai";
 
-//fir aa [google ai studion] search maarna hai or usse ek new api key generate karwana hai ek new project ke liye.
+//fir aao [google ai studio] me or wahan left-bottom me hoga "Get API Key" uss par click karna hai or fir wahan ek option hoga "Create API Key" uss par click karna hai or fir ek API key generate hogi usko copy kar lena hai or .env file me GOOGLE_GENAI_API_KEY=API_KEY likh dena hai.
+
+//Gemini unstructured response ko support karta hai, iska matlab hai ki hum apne prompt me response ka format define kar sakte hai aur Gemini us format me hi response dega. Iske liye hume apne desired response format ke liye ek schema define karna hoga using "zod library", fir us schema ko "zodToJsonSchema" function ke through JSON schema me convert karna hoga aur usko config object me responseSchema field me pass karna hoga jab hum content generate karne ke liye ai.models.generateContent function call karenge.
+
+
+//Is project me hum ek interview report generate karne wala feature implement karenge jisme user apna resume, self description aur job description provide karega aur Gemini ke help se hum ek detailed interview report generate karenge jisme match score, technical questions, behavioral questions, skill gaps aur preparation plan include hoga. Hum iske alawa ek aur feature implement karenge jisme user apna resume, self description aur job description provide karega aur Gemini ke help se hum uske liye ek tailored resume generate karenge jo us job description ke hisab se optimized hoga. Is generated resume ko hum HTML format me receive karenge jise hum puppeteer library ke help se PDF me convert kar denge. 
 
 const { GoogleGenAI } = require("@google/genai");
-require("dotenv").config();
 const { z } = require("zod");
 const { zodToJsonSchema } = require("zod-to-json-schema");
+const puppeteer = require("puppeteer");
+
+require("dotenv").config();
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI_API_KEY,
 });
 
-//make a function
-async function invokeGeminiAi() {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: "Hello Gemini ! Explain What is Interview",
-  });
-  console.log(response.text);
-}
-
-const interviewReportsSchema = z.object({
+const interviewReportSchema = z.object({
   matchScore: z
     .number()
     .describe(
-      "A score between 0 to 100 indicating how well the candidate's profile matches the job description",
+      "A score between 0 and 100 indicating how well the candidate's profile matches the job describe",
     ),
   technicalQuestions: z
     .array(
@@ -38,14 +36,14 @@ const interviewReportsSchema = z.object({
         answer: z
           .string()
           .describe(
-            "How to answer this question, what points to cover, what approach to the take etc.",
+            "How to answer this question, what points to cover, what approach to take etc.",
           ),
       }),
     )
     .describe(
-      "technical question that can be asked in the interview along with their intention and how to answer them",
+      "Technical questions that can be asked in the interview along with their intention and how to answer them",
     ),
-  behaviourQuestions: z
+  behavioralQuestions: z
     .array(
       z.object({
         question: z
@@ -57,12 +55,12 @@ const interviewReportsSchema = z.object({
         answer: z
           .string()
           .describe(
-            "How to answer this question, what points to cover, what approach to the take etc.",
+            "How to answer this question, what points to cover, what approach to take etc.",
           ),
       }),
     )
     .describe(
-      "Behavioural Question that can be asked in the interview along with their intention and how to answer them",
+      "Behavioral questions that can be asked in the interview along with their intention and how to answer them",
     ),
   skillGaps: z
     .array(
@@ -70,7 +68,9 @@ const interviewReportsSchema = z.object({
         skill: z.string().describe("The skill which the candidate is lacking"),
         severity: z
           .enum(["low", "medium", "high"])
-          .describe("The severity of this skill gap, i.e."),
+          .describe(
+            "The severity of this skill gap, i.e. how important is this skill for the job and how much it can impact the candidate's chances",
+          ),
       }),
     )
     .describe(
@@ -81,38 +81,108 @@ const interviewReportsSchema = z.object({
       z.object({
         day: z
           .number()
-          .describe("The day number in the preparation plan,starting from 1"),
+          .describe("The day number in the preparation plan, starting from 1"),
         focus: z
           .string()
           .describe(
-            "describe main focus of this day in the preparation plan. e.g. data start",
+            "The main focus of this day in the preparation plan, e.g. data structures, system design, mock interviews etc.",
           ),
-        tasks: z.array(z.string()).describe("List of tasks to be done on this"),
+        tasks: z
+          .array(z.string())
+          .describe(
+            "List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.",
+          ),
       }),
     )
     .describe(
-      "A day-wise preparation plan for the candidate to follow in order to perpare for the",
+      "A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively",
+    ),
+  title: z
+    .string()
+    .describe(
+      "The title of the job for which the interview report is generated",
     ),
 });
 
-async function generateInterviewReport(
+async function generateInterviewReport({
   resume,
   selfDescription,
   jobDescription,
-) {
-  const prompt = `Generate an interview report for a candidate with the following deatails:
-      Resume:${resume}
-      Self Description : ${selfDescription}
-      Job Description : ${jobDescription}
-    `;
+}) {
+  const prompt = `Generate an interview report for a candidate with the following details:
+                        Resume: ${resume}
+                        Self Description: ${selfDescription}
+                        Job Description: ${jobDescription}
+`;
+
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-flash-preview",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseSchema: zodToJsonSchema(interviewReportsSchema),
+      responseSchema: zodToJsonSchema(interviewReportSchema),
     },
   });
+
   return JSON.parse(response.text);
 }
-module.exports = generateInterviewReport;
+
+async function generatePdfFromHtml(htmlContent) {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+  const pdfBuffer = await page.pdf({
+    format: "A4",
+    margin: {
+      top: "20mm",
+      bottom: "20mm",
+      left: "15mm",
+      right: "15mm",
+    },
+  });
+
+  await browser.close();
+
+  return pdfBuffer;
+}
+
+async function generateResumePdf({ resume, selfDescription, jobDescription }) {
+  const resumePdfSchema = z.object({
+    html: z
+      .string()
+      .describe(
+        "The HTML content of the resume which can be converted to PDF using any library like puppeteer",
+      ),
+  });
+
+  const prompt = `Generate resume for a candidate with the following details:
+                        Resume: ${resume}
+                        Self Description: ${selfDescription}
+                        Job Description: ${jobDescription}
+
+                        the response should be a JSON object with a single field "html" which contains the HTML content of the resume which can be converted to PDF using any library like puppeteer.
+                        The resume should be tailored for the given job description and should highlight the candidate's strengths and relevant experience. The HTML content should be well-formatted and structured, making it easy to read and visually appealing.
+                        The content of resume should be not sound like it's generated by AI and should be as close as possible to a real human-written resume.
+                        you can highlight the content using some colors or different font styles but the overall design should be simple and professional.
+                        The content should be ATS friendly, i.e. it should be easily parsable by ATS systems without losing important information.
+                        The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
+                    `;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: zodToJsonSchema(resumePdfSchema),
+    },
+  });
+
+  const jsonContent = JSON.parse(response.text);
+
+  const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
+
+  return pdfBuffer;
+}
+
+module.exports = { generateInterviewReport, generateResumePdf };
