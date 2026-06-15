@@ -9,8 +9,8 @@
 //app.js => ka main kaam hai server ka instance create karna or dusra kaam middleware or routes ko create karna or use karna.
 
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const app = express();
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 //middleware => jo help karti hai request ki body se data ko read karne ke liye allow karta hai

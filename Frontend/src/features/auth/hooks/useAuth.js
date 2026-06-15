@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 import { AuthContext } from "../../auth.context";
 import { login, register, logout, getMe } from "../services/auth.api";
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -17,50 +18,54 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
-const handleRegister = async ({ username, email, password }) => {
-  setLoading(true);
-  try {
-    const data = await register({ username, email, password });
-    setUser(data.user);
-  } catch (err) {
-    console.log(err);
-  } finally {
-    setLoading(false);
-  }
-};
-const handleLogout = async () => {
-  setLoading(true);
-  try {
-    const data = await logout();
-    setUser(null);
-  } catch (err) {
-    console.log(err);
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleRegister = async ({ username, email, password }) => {
+    setLoading(true);
+    try {
+      const data = await register({ username, email, password });
+      setUser(data.user);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const data = await logout();
+      setUser(null);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// const handleGetme = async () => {
-//   setLoading(true);
-//   try {
-//     const data = await getMe();
-//     setUser(data.user);
-//   } catch (err) {
-//     console.log(err);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
+  // const handleGetme = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await getMe();
+  //     setUser(data.user);
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-useEffect(() => {
-  setLoading(true);
-  const getandSetUser = async() => {
-    const data = await getMe();
-    setUser(data.user);
-    setLoading(false);
-  }
-  getandSetUser();
-},[])
+  useEffect(() => {
+    setLoading(true);
+    const getandSetUser = async () => {
+      try {
+        const data = await getMe();
+        setUser(data.user);
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
+    };
+    getandSetUser();
+  }, []);
 
   return {
     user,
@@ -68,7 +73,5 @@ useEffect(() => {
     handleRegister,
     handleLogin,
     handleLogout,
-    handleGetme,
   };
-
 };

@@ -16,5 +16,5 @@ interviewRouter.post(
   upload.single("resume"),
   interviewController.generateInterViewReportcontroller,
 );
-
+interviewRouter.get("/report/:interviewId",authMiddleware.authUser,interviewController.getInterviewReportByIdController);
 module.exports = interviewRouter;
