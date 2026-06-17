@@ -8,7 +8,7 @@ export const InterviewProvider = ({ children }) => {
 };
 
 return (
-  <interviewContext.Provider value={{ loading, setLoading, report, setReport }}>
+  <interviewContext.Provider value={{ loading, setLoading, report, setReport,reports,setReports }}>
     {children}
   </interviewContext.Provider>
 );

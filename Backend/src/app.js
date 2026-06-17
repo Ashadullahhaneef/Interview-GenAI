@@ -7,14 +7,12 @@
 //cookie-parser = for cookie me token send karna or read karne ke kaam me aata hai.
 
 //app.js => ka main kaam hai server ka instance create karna or dusra kaam middleware or routes ko create karna or use karna.
-
 const express = require("express");
-const app = express();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+const app = express();
 //middleware => jo help karti hai request ki body se data ko read karne ke liye allow karta hai
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -29,7 +27,7 @@ app.use(
 const authRouter = require("./routes/auth.routes");
 const interviewRouter = require("./routes/interview.routes");
 
-// using all the routes here
+/* using all the routes here */
 app.use("/api/auth", authRouter);
 app.use("/api/interview", interviewRouter);
 

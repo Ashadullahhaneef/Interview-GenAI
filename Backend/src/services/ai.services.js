@@ -4,15 +4,12 @@
 
 //Gemini unstructured response ko support karta hai, iska matlab hai ki hum apne prompt me response ka format define kar sakte hai aur Gemini us format me hi response dega. Iske liye hume apne desired response format ke liye ek schema define karna hoga using "zod library", fir us schema ko "zodToJsonSchema" function ke through JSON schema me convert karna hoga aur usko config object me responseSchema field me pass karna hoga jab hum content generate karne ke liye ai.models.generateContent function call karenge.
 
-
-//Is project me hum ek interview report generate karne wala feature implement karenge jisme user apna resume, self description aur job description provide karega aur Gemini ke help se hum ek detailed interview report generate karenge jisme match score, technical questions, behavioral questions, skill gaps aur preparation plan include hoga. Hum iske alawa ek aur feature implement karenge jisme user apna resume, self description aur job description provide karega aur Gemini ke help se hum uske liye ek tailored resume generate karenge jo us job description ke hisab se optimized hoga. Is generated resume ko hum HTML format me receive karenge jise hum puppeteer library ke help se PDF me convert kar denge. 
+//Is project me hum ek interview report generate karne wala feature implement karenge jisme user apna resume, self description aur job description provide karega aur Gemini ke help se hum ek detailed interview report generate karenge jisme match score, technical questions, behavioral questions, skill gaps aur preparation plan include hoga. Hum iske alawa ek aur feature implement karenge jisme user apna resume, self description aur job description provide karega aur Gemini ke help se hum uske liye ek tailored resume generate karenge jo us job description ke hisab se optimized hoga. Is generated resume ko hum HTML format me receive karenge jise hum puppeteer library ke help se PDF me convert kar denge.
 
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
 const { zodToJsonSchema } = require("zod-to-json-schema");
 const puppeteer = require("puppeteer");
-
-require("dotenv").config();
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI_API_KEY,
