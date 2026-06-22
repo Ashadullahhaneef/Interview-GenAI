@@ -247,6 +247,8 @@ const Home = () => {
         </section>
       )}
 
+      
+
       {/* Page Footer */}
       <footer className="page-footer">
         <a href="#">Privacy Policy</a>
