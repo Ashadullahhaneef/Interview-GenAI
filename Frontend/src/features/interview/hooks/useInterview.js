@@ -5,11 +5,12 @@ import {
   generateResumePdf,
 } from "../services/interview.api";
 import { useContext, useEffect } from "react";
-import { InterviewContext } from "../interview.context";
+import { interviewContext } from "../interview.context";
 import { useParams } from "react-router";
 
+
 export const useInterview = () => {
-  const context = useContext(InterviewContext);
+  const context = useContext(interviewContext);
   const { interviewId } = useParams();
 
   if (!context) {
