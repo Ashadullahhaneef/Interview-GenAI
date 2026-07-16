@@ -124,6 +124,34 @@ async function generateInterviewReport({
   return JSON.parse(response.text);
 }
 
+async function generateResumePdf({ resume, selfDescription, jobDescription }) {
+  const resumePdfSchema = z.object({
+    html: z
+      .string()
+      .describe(
+        "The HTML content of the resume which can be converted to PDF using a",
+      ),
+  });
+  const prompt = `Generate resume for a candidate with the following details:
+  Resume:${resume}
+  Self Description:${selfDescription}
+  Job Description : ${jobDescription}
+  the response should be a JSON object with a single field "html" which contains 
+  `;
+  const response = await ai.model.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: promp,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: zodToJsonSchema(resumePdfSchema),
+    },
+  });
+
+  const jsonContent = JSON.parse(response.text);
+  const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
+  return pdfBuffer;
+}
+
 async function generatePdfFromHtml(htmlContent) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();

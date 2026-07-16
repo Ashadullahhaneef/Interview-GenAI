@@ -8,7 +8,6 @@ import { useContext, useEffect } from "react";
 import { interviewContext } from "../interview.context";
 import { useParams } from "react-router";
 
-
 export const useInterview = () => {
   const context = useContext(interviewContext);
   const { interviewId } = useParams();
@@ -33,14 +32,17 @@ export const useInterview = () => {
         selfDescription,
         resumeFile,
       });
-      setReport(response.interviewReport);
+      console.log(response);
+      setReport(response?.interviewReport ?? []);
     } catch (error) {
       console.log(error);
+
+      setReports([]);
     } finally {
       setLoading(false);
     }
 
-    return response.interviewReport;
+    return response?.interviewReport ?? [];
   };
 
   const getReportById = async (interviewId) => {
@@ -48,13 +50,16 @@ export const useInterview = () => {
     let response = null;
     try {
       response = await getInterviewReportById(interviewId);
-      setReport(response.interviewReport);
+      console.log(response);
+      setReport(response?.interviewReport ?? []);
     } catch (error) {
       console.log(error);
+
+      setReports([]);
     } finally {
       setLoading(false);
     }
-    return response.interviewReport;
+    return response?.interviewReport ?? [];
   };
 
   const getReports = async () => {
@@ -62,14 +67,17 @@ export const useInterview = () => {
     let response = null;
     try {
       response = await getAllInterviewReports();
-      setReports(response.interviewReports);
+      console.log(response);
+      setReports(response?.interviewReports ?? []);
     } catch (error) {
       console.log(error);
+
+      setReports([]);
     } finally {
       setLoading(false);
     }
 
-    return response.interviewReports;
+    return response?.interviewReports ?? [];
   };
 
   const getResumePdf = async (interviewReportId) => {
@@ -77,6 +85,7 @@ export const useInterview = () => {
     let response = null;
     try {
       response = await generateResumePdf({ interviewReportId });
+      console.log(response);
       const url = window.URL.createObjectURL(
         new Blob([response], { type: "application/pdf" }),
       );

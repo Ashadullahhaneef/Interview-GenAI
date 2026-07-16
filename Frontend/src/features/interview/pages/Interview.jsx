@@ -3,6 +3,7 @@ import "../style/interview.scss";
 import { useInterview } from "../hooks/useInterview.js";
 import { useNavigate, useParams } from "react-router";
 
+
 const NAV_ITEMS = [
   {
     id: "technical",
