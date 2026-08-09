@@ -53,19 +53,19 @@ export const useAuth = () => {
   //   }
   // };
 
-  useEffect(() => {
-    setLoading(true);
-    const getandSetUser = async () => {
-      try {
-        const data = await getMe();
-        setUser(data.user);
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
-    getandSetUser();
-  }, []);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const getandSetUser = async () => {
+  //     try {
+  //       const data = await getMe();
+  //       setUser(data.user);
+  //     } catch (error) {
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   getandSetUser();
+  // }, []);
 
   return {
     user,
